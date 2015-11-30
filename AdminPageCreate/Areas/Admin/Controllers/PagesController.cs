@@ -82,6 +82,8 @@ namespace AdminPageCreate.Areas.Admin.Controllers
             {
                 return HttpNotFound();
             }
+            var bodyText = Encoding.UTF8.GetString(page.Body);
+            ViewBag.Text = bodyText;
             return View(page);
         }
 
@@ -104,6 +106,8 @@ namespace AdminPageCreate.Areas.Admin.Controllers
                     oldPage.Title = page.Title;
                     oldPage.Status = page.Status;
                     db.Entry(oldPage).State = EntityState.Modified;
+                    var htmBody = Encoding.UTF8.GetBytes(bodyText);
+                    oldPage.Body = htmBody;
                     db.SaveChanges();
                 }
                 else
