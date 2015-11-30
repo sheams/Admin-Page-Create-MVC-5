@@ -90,14 +90,30 @@ namespace AdminPageCreate.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Title,MetaKeyword,MetaDescription,ShortDescription,Body,CreationDate,ModificationDate,CreateBy,ModifyBy,Status")] Page page)
+        [ValidateInput(false)]
+        public ActionResult Edit([Bind(Include = "Id,Title,MetaKeyword,MetaDescription,ShortDescription,Body,Status")] Page page, string bodyText)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(page).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                var oldPage = db.Pages.Find(page.Id);
+                if(oldPage != null)
+                {
+                    oldPage.MetaDescription = page.MetaDescription;
+                    oldPage.MetaKeyword = page.MetaKeyword;
+                    oldPage.ShortDescription = page.ShortDescription;
+                    oldPage.Title = page.Title;
+                    oldPage.Status = page.Status;
+                    db.Entry(oldPage).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Model Not Found";
+                    return View(page);
+                }
                 return RedirectToAction("Index");
             }
+
             return View(page);
         }
 
